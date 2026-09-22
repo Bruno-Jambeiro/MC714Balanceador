@@ -26,6 +26,8 @@
 }
 
 \maketitle
+\thispagestyle{plain}
+\pagestyle{plain}
 
 \section{Resumo}
 Este relatório apresenta o projeto, a modelagem analítica e a avaliação por simulação de um balanceador de carga em um sistema distribuído composto por três servidores homogêneos. O sistema foi analisado sob três políticas de despacho: Escolha Aleatória, \textit{Round-Robin} e Fila Mais Curta. O objetivo principal foi comparar o desempenho dessas políticas através do tempo médio de resposta ($E[R]$) e validar as propriedades fundamentais da Teoria das Filas, como a estabilidade do sistema, a conservação de trabalho e a Lei de Little, em diferentes níveis de carga ($\lambda$).
@@ -37,6 +39,8 @@ A arquitetura do sistema simulado é composta por um \textit{dispatcher} (balanc
     \item \textbf{\textit{Round-Robin}}: O balanceador distribui as requisições de forma cíclica e determinística, seguindo a ordem 1, 2, 3, 1, 2, 3, garantindo uma distribuição equitativa ao longo do tempo.
     \item \textbf{Fila Mais Curta}: O balanceador consulta o estado de cada servidor no instante da chegada de uma requisição e a envia para aquele com o menor número total de tarefas (esperando na fila somado àquela em execução). Em caso de empate, a escolha entre os empatados é feita aleatoriamente.
 \end{itemize}
+
+Do ponto de vista prático e de implementação de software, a arquitetura foi desenvolvida na linguagem Python de forma modular e orientada a objetos. O projeto é dividido em três componentes principais: o arquivo \texttt{classes.py}, que abriga o núcleo do sistema contendo as entidades \texttt{Pacote}, \texttt{Servidor}, \texttt{Balanceador} e a máquina de estados no motor \texttt{Simulador} (baseado em avanços de tempo discreto); o script principal \texttt{simulacoes.py}, que orquestra a execução das réplicas, injeta os diferentes níveis de carga $\lambda$ e processa o rigor estatístico como as métricas de intervalo de confiança; e o módulo \texttt{graficos.py}, dedicado exclusivamente à geração das representações visuais utilizadas neste relatório.
 
 \section{Descrição dos servidores e parametrização do tráfego}
 O sistema é constituído por três servidores homogêneos. Cada servidor opera com uma única \textit{thread} de execução e atende as requisições de forma serial sob a disciplina \textit{First Come, First Served} (FCFS). A fila de cada servidor é assumida como ilimitada. A taxa de serviço individual de cada servidor segue uma distribuição exponencial de média $1/\mu = 1.0$ unidade de tempo (u.t.), o que resulta em uma capacidade de atendimento de $\mu = 1.0$ requisição por unidade de tempo para cada nó. 
