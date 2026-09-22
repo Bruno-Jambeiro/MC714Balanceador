@@ -1,0 +1,146 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage[utf8]{inputenc}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Trabalho 1\\
+\large Balanceador de Carga para um Sistema Distribuído}
+
+\author{\IEEEauthorblockN{Lucas Gomes Bussinger da Silva}
+\IEEEauthorblockA{RA: 247314}
+\and
+\IEEEauthorblockN{Bruno Jambeiro Mesquita}
+\IEEEauthorblockA{RA: 260382}
+}
+
+\maketitle
+
+\section{Resumo}
+% Adicione o conteúdo do resumo aqui.
+
+\section{Descrição da arquitetura do balanceador e políticas adotadas}
+% Adicione a descrição da arquitetura e das políticas adotadas aqui.
+
+\section{Descrição dos servidores e parametrização do tráfego}
+% Adicione a descrição dos servidores e da parametrização do tráfego aqui.
+
+\section{Modelagem Analítica}
+
+\subsection{Independência probabilística entre os servidores (política de escolha aleatória)}
+
+3 Servidores
+
+$N$ = Número de jobs no sistema (3 servidores);
+
+$N_1, N_2, N_3$ = Número de Jobs no servidor 1, 2, 3 respectivamente
+
+$N = N_1 + N_2 + N_3$
+
+Para Independência: a Distribuição Conjunta é igual ao produto das marginais:
+
+$n = n_1 + n_2 + n_3$
+
+$\lambda$ = taxa de requisições de pacotes no sistema
+
+$p_1, p_2, p_3$ = probabilidade de a requisição ser enviada para o servidor 1, 2 e 3.
+
+\begin{align}
+&P(N_1 = n_1, N_2 = n_2, N_3 = n_3) \nonumber\\
+&= P(N_1 = n_1) \cdot P(N_2 = n_2) \cdot P(N_3 = n_3) \nonumber\\
+&\quad (\text{Independência}).
+\end{align}
+
+Verificando:
+\begin{align}
+&P(N_1 = n_1, N_2 = n_2, N_3 = n_3) \nonumber\\
+&= P(N_1 = n_1, N_2 = n_2, N_3 = n_3 \mid N = n) \cdot P(N = n) \nonumber\\
+&= P(N_1 = n_1 \mid N = n) \cdot P(N_2 = n_2 \mid N = n) \nonumber\\
+&\quad \cdot P(N_3 = n_3 \mid N = n) \cdot P(N = n) \nonumber\\
+&= \frac{n!}{n_1! \, n_2! \, n_3!} \cdot (p_1)^{n_1} \cdot (p_2)^{n_2} \cdot (p_3)^{n_3} \cdot \frac{e^{-\lambda} \lambda^n}{n!} \nonumber\\
+&= \frac{e^{-\frac{\lambda}{3}} \left(\frac{\lambda}{3}\right)^{n_1}}{n_1!} \cdot \frac{e^{-\frac{\lambda}{3}} \left(\frac{\lambda}{3}\right)^{n_2}}{n_2!} \cdot \frac{e^{-\frac{\lambda}{3}} \left(\frac{\lambda}{3}\right)^{n_3}}{n_3!}
+\end{align}
+
+Que é justamente a multiplicação das marginais modeladas por processo de Poisson com $\lambda_i = \frac{\lambda}{3}$:
+\begin{align}
+&P(N_1 = n_1) \cdot P(N_2 = n_2) \cdot P(N_3 = n_3) \nonumber\\
+&= \frac{e^{-\frac{\lambda}{3}} \left(\frac{\lambda}{3}\right)^{n_1}}{n_1!} \cdot \frac{e^{-\frac{\lambda}{3}} \left(\frac{\lambda}{3}\right)^{n_2}}{n_2!} \cdot \frac{e^{-\frac{\lambda}{3}} \left(\frac{\lambda}{3}\right)^{n_3}}{n_3!}
+\end{align}
+
+Sendo os 3 servidores Independentes entre si sob a Política Aleatória.
+
+\subsection{Servidores em fila $M / M / 1$}
+
+Conforme visto no item (a), pelo teorema da decomposição (splitting) de Poisson, a política aleatória divide o processo de chegadas de taxa $\lambda$ em três processos independentes com taxas $\lambda_i = \frac{\lambda}{3}$. Como os tempos entre chegadas em cada servidor têm distribuição Exponencial (M), o tempo de serviço tem distribuição Exponencial (M) e cada servidor tem 1 thread (1), cada servidor se comporta independentemente como uma fila $M/M/1$ isolada.
+
+\paragraph{Utilização}
+$U_i$ = utilização do servidor
+
+$p_0 = (1 - \rho)\rho^0 = 1 - \rho \to$ Probabilidade do servidor estar ocioso
+
+$U_i = 1 - p_0 = \rho = \frac{\lambda_i}{\mu_i} \to$ Probabilidade do servidor estar sendo utilizado (Utilização Média)
+
+\paragraph{Número Médio de requisições no servidor: $E[N_i]$}
+\begin{align}
+E[N_i] &= \sum_{k=0}^{\infty} k \cdot p_k = \sum_{k=0}^{\infty} k \cdot (1 - \rho) \cdot \rho^k = (1 - \rho) \sum_{k=0}^{\infty} k \rho^k \nonumber\\
+&= (1 - \rho)\rho \sum_{k=1}^{\infty} k \rho^{k-1} = (1 - \rho)\rho \frac{d}{d\rho} \left[ \sum_{k=0}^{\infty} \rho^k \right] \nonumber\\
+&= (1 - \rho)\rho \left( \frac{1}{1-\rho} \right)^2 = \frac{\rho}{1 - \rho}
+\end{align}
+
+\begin{equation}
+E[N_i] = \frac{\rho}{1 - \rho} \quad \text{para } \rho < 1
+\end{equation}
+
+\paragraph{Tempo médio de resposta: $E[R]$}
+pela lei de Little:
+\begin{equation}
+E[N_i] = \lambda_i \cdot E[R]
+\end{equation}
+
+\begin{equation}
+E[R] = \frac{E[N_i]}{\lambda_i} = \frac{1}{\mu_i - \lambda_i}
+\end{equation}
+
+\paragraph{Tempo médio de requisições na fila: $E[T_Q]$}
+\begin{equation}
+E[R] = E[T_Q] + \frac{1}{\mu_i}
+\end{equation}
+
+\begin{equation}
+E[T_Q] = E[R] - \frac{1}{\mu_i}
+\end{equation}
+
+\begin{equation}
+E[T_Q] = \frac{\rho}{\mu_i - \lambda_i}
+\end{equation}
+
+\subsection{Vazão $X$ e utilização $U$ valendo para as três políticas}
+
+\paragraph{Vazão $X$}
+Em um sistema estável (onde a taxa de chegada é menor que a capacidade de atendimento, $\lambda < 3\mu$), o sistema é conservador de trabalho, o que significa que nenhuma requisição é descartada. Tudo o que entra no balanceador de carga tem que, eventualmente, ser processado e sair do sistema. Como a taxa de entrada é $\lambda$, a vazão (taxa de saída) será inevitavelmente igual à taxa de chegada: $X = \lambda$. A política de balanceamento (Aleatória, Round-Robin ou Fila Mais Curta) apenas reorganiza a ordem ou o local de espera das requisições, mas não altera o fato de que 100\% das requisições recebidas serão atendidas.
+
+\paragraph{Utilização $U_i$}
+A utilização é definida pela fração de tempo que um servidor passa ocupado. O trabalho total que chega ao sistema por unidade de tempo é dado por $\lambda \cdot E[S] = \frac{\lambda}{\mu}$.
+
+Esse trabalho total precisa obrigatoriamente ser absorvido pelo conjunto dos 3 servidores. Como os servidores são homogêneos ($\mu = 1$ para todos) e as três políticas distribuem a carga de forma simétrica e justa a longo prazo (nenhuma delas boicota ou favorece permanentemente um servidor específico), o trabalho total será dividido igualmente entre os três.
+
+Portanto, a utilização média de cada servidor será a divisão do trabalho total por três: $U_i = \frac{\lambda}{3\mu} = \rho$. Isso independe de a requisição ter sido enviada por sorteio, de forma cíclica ou para a menor fila.
+
+Como apontado na aula, a política de balanceamento afeta a variabilidade e, consequentemente, altera apenas o tempo de resposta $E[R]$ e o tamanho da fila $E[N]$. A vazão e a utilização independem da política.
+
+\section{Resultados e discussão}
+% Adicione os resultados e discussão aqui.
+
+\section{Conclusão}
+% Adicione a conclusão aqui.
+
+\end{document}
