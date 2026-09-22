@@ -159,6 +159,25 @@ Comparando as três políticas implementadas (Figura \ref{fig:comparacao}), os r
 \label{fig:comparacao}
 \end{figure}
 
+A Figura~\ref{fig:temporal_estavel} ilustra a evolução temporal de $N(t)$, $R(t)$ e $\bar{U}(t)$ nos extremos do regime estável, contrastando o comportamento de baixa carga ($\lambda=0{,}6$, $\rho=0{,}2$) com o de alta carga ($\lambda=2{,}7$, $\rho=0{,}9$). Em ambos os casos, o sistema converge para o regime estacionário após o período de \textit{warm-up}, porém com níveis de ocupação e variabilidade radicalmente distintos.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}[b]{0.48\columnwidth}
+    \centering
+    \includegraphics[width=\linewidth]{../plots/simulacao_lambda_0.6.png}
+    \small (a) $\lambda = 0{,}6$
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.48\columnwidth}
+    \centering
+    \includegraphics[width=\linewidth]{../plots/simulacao_lambda_2.7.png}
+    \small (b) $\lambda = 2{,}7$
+\end{minipage}
+\caption{Evolução temporal de $N(t)$, $R(t)$ e $\bar{U}(t)$: baixa carga vs.\ alta carga estável.}
+\label{fig:temporal_estavel}
+\end{figure}
+
 A justificativa para tal fenômeno reside na redução da variância dos tempos entre chegadas percebidos pelos servidores e na minimização de picos localizados de congestionamento. Enquanto a escolha aleatória permite colisões sequenciais no roteamento em curtos espaços de tempo (agravando filas), a política \textit{Round-Robin} determiniza a distribuição das chegadas, atenuando os surtos em cada fila. Contudo, é a política da Menor Fila que atinge o desempenho ótimo neste arranjo por considerar ativamente o inventário instantâneo de pacotes de cada servidor antes de tomar uma decisão, impedindo que requisições repousem em filas de servidores ocupados enquanto houver servidores ociosos. É notório que o ganho percentual dessas políticas sobre a aleatória amplifica-se expressivamente para cargas maiores, onde o congestionamento é mais crítico. Em $\lambda=2,7$, a Menor Fila proporciona um decréscimo de mais de 60\% no tempo de espera em relação ao modelo aleatório puro.
 
 Ademais, demonstrou-se empíricamente a universalidade da Lei de Little ($E[N] = X \cdot E[R]$) para todas as políticas, ilustrada na Figura \ref{fig:little}. Os resultados atestam, com erro inferior a 1\% em todas as configurações, que o tempo que os pacotes aguardam pelo sistema está intrinsecamente ligado à ocupação espacial medida pela área sob a curva das filas.
@@ -170,6 +189,22 @@ Ademais, demonstrou-se empíricamente a universalidade da Lei de Little ($E[N] =
 \end{figure}
 
 Por fim, ao submeter o sistema a uma taxa de chegadas $\lambda=3,3$ maior do que sua capacidade agregada de escoamento $3\mu = 3,0$, as fórmulas analíticas perdem fundamentação uma vez que a condição de estabilidade $\rho = \frac{\lambda}{3\mu} < 1$ não é satisfeita. Nesse regime, a simulação demonstra o colapso gradual do desempenho. Como $\rho > 1$, o sistema passa a acumular $\lambda - 3\mu = 0,3$ requisições permanentemente por unidade de tempo, sendo perfeitamente descrito pela aproximação fluida $N(t) \approx N(0) + (\lambda - 3\mu)t$.
+
+A Figura~\ref{fig:instavel} ilustra a evolução temporal de $N(t)$, $R(t)$ e $\bar{U}(t)$ para as três políticas no regime instável. Nota-se o crescimento secular e contínuo das filas em todas as políticas, com a utilização média dos servidores se aproximando de $100\%$.
+
+\begin{figure}[H]
+\centerline{\includegraphics[width=\columnwidth]{../plots/simulacao_lambda_3.3_instavel.png}}
+\caption{Simulação temporal no regime instável ($\lambda = 3{,}3$, $3\mu = 3{,}0$): crescimento ilimitado de $N(t)$ e $R(t)$.}
+\label{fig:instavel}
+\end{figure}
+
+A Figura~\ref{fig:fluido} compara o crescimento de $N(t)$ observado nas simulações com o modelo fluido teórico, confirmando a taxa de acúmulo de $0{,}3$ requisições por unidade de tempo prevista analiticamente.
+
+\begin{figure}[H]
+\centerline{\includegraphics[width=\columnwidth]{../plots/modelo_fluido_lambda_3.3.png}}
+\caption{Verificação do modelo fluido: $N(t) \approx (\lambda - 3\mu)\,t = 0{,}3t$ no regime instável.}
+\label{fig:fluido}
+\end{figure}
 
 
 

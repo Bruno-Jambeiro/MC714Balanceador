@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.3.23)  22 SEP 2026 15:13
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.3.23)  22 SEP 2026 20:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -408,10 +408,19 @@ Underfull \hbox (badness 5008) in paragraph at lines 51--51
 File: ../plots/comparacao_politicas_ER.png Graphic file (type bmp)
 <../plots/comparacao_politicas_ER.png>
  [2]
+File: ../plots/simulacao_lambda_0.6.png Graphic file (type bmp)
+<../plots/simulacao_lambda_0.6.png>
+File: ../plots/simulacao_lambda_2.7.png Graphic file (type bmp)
+<../plots/simulacao_lambda_2.7.png>
 File: ../plots/verificacao_lei_de_little.png Graphic file (type bmp)
 <../plots/verificacao_lei_de_little.png>
+File: ../plots/simulacao_lambda_3.3_instavel.png Graphic file (type bmp)
+<../plots/simulacao_lambda_3.3_instavel.png>
+ [3]
+File: ../plots/modelo_fluido_lambda_3.3.png Graphic file (type bmp)
+<../plots/modelo_fluido_lambda_3.3.png>
 
-Underfull \hbox (badness 5578) in paragraph at lines 179--180
+Underfull \hbox (badness 5578) in paragraph at lines 214--215
 []\TU/pcr/m/n/10 As simulações computacionais evidenciaram com
  []
 
@@ -426,7 +435,9 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[3] (./relatorio_trabalho1.aux)
+[4
+
+] (./relatorio_trabalho1.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -437,12 +448,12 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 3885 strings out of 476846
- 62549 string characters out of 5803824
+ 3936 strings out of 476846
+ 64214 string characters out of 5803824
  1950627 words of memory out of 5000000
- 25777 multiletter control sequences out of 15000+600000
- 562948 words of font info for 66 fonts, out of 8000000 for 9000
+ 25820 multiletter control sequences out of 15000+600000
+ 564493 words of font info for 72 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 57i,10n,65p,1024b,263s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,10n,65p,1024b,272s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on relatorio_trabalho1.pdf (3 pages).
+Output written on relatorio_trabalho1.pdf (4 pages).
