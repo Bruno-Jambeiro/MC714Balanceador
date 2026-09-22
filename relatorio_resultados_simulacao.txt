@@ -68,76 +68,13 @@ RESPOSTAS DETALHADAS PARA OS ITENS D, E E F DO ENUNCIADO
    observa-se rigorosamente que:
        E[R]_sim^(Fila Mais Curta) <= E[R]_sim^(Round-Robin) <= E[R]_sim^(Aleatória) ~= 1 / (mu - lambda/3)
 
-2. Explicação do porquê desta ordenação:
-   - Política Aleatória (Dispatcher cego e sem memória):
-     Distribui as requisições com probabilidade 1/3 para cada servidor de forma independente
-     do estado atual do sistema. Consequentemente, pode enviar pacotes para um servidor que
-     já possui uma fila extensa enquanto outro servidor está ocioso. Além disso, pelo Teorema
-     da Decomposição de Poisson, as chegadas em cada servidor continuam sendo um processo de
-     Poisson (com alta variabilidade, coeficiente de variação Ca = 1), gerando filas M/M/1.
-
-   - Política Round-Robin (Dispatcher com memória da última escolha):
-     Ao alternar estritamente entre os servidores (1, 2, 3, 1, 2, 3...), a variabilidade do
-     processo de chegada individual em cada servidor é reduzida. O processo de chegadas deixa
-     de ser Poisson e passa a ser uma distribuição de Erlang-3 (soma de 3 variáveis exponenciais),
-     cujo coeficiente de variação ao quadrado é Ca^2 = 1/3 < 1. Pela fórmula de Kingman/Allen-Cunneen
-     para filas G/M/1, a redução na variabilidade das chegadas reduz o tempo médio de espera na fila,
-     tornando o Round-Robin superior à Escolha Aleatória.
-
-   - Política de Fila Mais Curta / Menor Fila (Dispatcher ciente do estado do sistema):
-     Diferente das políticas estáticas, a Fila Mais Curta monitora ativamente o tamanho das filas
-     (fila + em execução). Ela garante dinamicamente que nenhum servidor fique ocioso enquanto
-     houver requisições acumuladas em outros nós, minimizando o desbalanceamento estocástico.
-     Como o tempo de resposta é uma função convexa da ocupação da fila, evitar estados extremos
-     de sobrecarga local em um servidor gera o menor tempo de resposta global possível.
-
-3. Quantificação dos Ganhos:
-   - Sob baixa carga (lambda = 0.6, rho = 0.20): as filas quase sempre estão vazias (E[R] ~= E[S] = 1.0),
-     e os ganhos são modestos (~2% a 5%).
-   - Sob alta carga (lambda = 2.7, rho = 0.90): a contenção é severa. A Fila Mais Curta reduz o
-     tempo médio de resposta de aproximadamente 10.0 u.t. (Aleatória) para cerca de 2.0 u.t.,
-     representando um ganho superior a 75-80% de redução no tempo de resposta!
-
 --- ITEM (e): VERIFICAÇÃO DA LEI DE LITTLE ---
-1. A Lei de Little estabelece que, em qualquer sistema estacionário estável:
-       E[N] = X * E[R]
-   onde:
-   - E[N] é o número médio de requisições no sistema (medido pela integral no tempo dividida pela duração);
-   - X é a vazão média efetiva do sistema (requisições concluídas por unidade de tempo);
-   - E[R] é o tempo médio de resposta por requisição.
-
-2. Resultados Simulados:
-   Em todas as 15 configurações avaliadas (3 políticas x 5 taxas lambda), a discrepância relativa
+1. Em todas as 15 configurações avaliadas (3 políticas x 5 taxas lambda), a discrepância relativa
    entre a medição direta da área sob a curva E[N] e o produto X * E[R] foi inferior a 1.0% (tipicamente < 0.3%).
-   Isso valida tanto a corretude matemática do simulador quanto a universalidade da Lei de Little,
-   que é independente da distribuição dos tempos de serviço e da política de escalonamento.
 
 --- ITEM (f): ANÁLISE DO REGIME INSTÁVEL (lambda = 3.3) ---
-1. Por que o sistema é instável?
-   A capacidade máxima de serviço combinada dos 3 servidores é:
-       C_max = 3 * mu = 3 * 1.0 = 3.0 requisições / u.t.
-   Para lambda = 3.3, a taxa média de chegada de trabalho supera a capacidade máxima de escoamento
-   do sistema (lambda > 3*mu). A condição de estabilidade necessária e suficiente rho < 1 deixa
-   de ser satisfeita (rho = 3.3 / 3.0 = 1.10 > 1.0).
-
-2. Por que as fórmulas estacionárias deixam de valer?
-   As fórmulas deduzidas nos itens anteriores (como E[R] = 1/(mu - lambda/3) e a distribuição pk = (1-rho)*rho^k)
-   pressupõem a existência de uma distribuição de probabilidade estacionária lim_{t -> inf} P(N(t) = k).
-   Quando rho > 1, a cadeia de Markov associada é transiente (as probabilidades de estado convergem a zero
-   para qualquer k finito, e a massa de probabilidade "escapa" para o infinito). Não existe regime permanente!
-
-3. Comparação com a Aproximação Fluida:
-   Em termos determinísticos / fluidos, a taxa líquida de acúmulo de clientes no sistema é dada pela
-   equação diferencial:
-       dN/dt = lambda - sum_{i=1}^3 mu_i * U_i(t)
-   Como o sistema opera permanentemente saturado, todos os 3 servidores operam com utilização U_i(t) ~= 1.0.
-   Portanto:
-       dN/dt = lambda - 3*mu = 3.3 - 3.0 = 0.3 requisições / unidade de tempo
-   Integrando no tempo com condição inicial N(0) ~= 0:
-       N(t) ~= N(0) + (lambda - 3*mu) * t = 0.3 * t
-   Na simulação, para t = 5000 unidades de tempo, o número de requisições acumuladas aproxima-se de:
-       N(5000) ~= 0.3 * 5000 = 1500 requisições
-   O gráfico gerado 'modelo_fluido_lambda_3.3.png' comprova que a trajetória simulada de N(t) oscila
-   estocasticamente exatamente em torno da reta teórica fluida de inclinação 0.3!
+1. C_max = 3 * mu = 3.0 req/u.t. Para lambda = 3.3, rho = 1.10 > 1.0.
+2. Na aproximação fluida: dN/dt = lambda - 3*mu = 0.3 req/u.t.
+   N(5000) ~= 0.3 * 5000 = 1500 requisições acumuladas.
 
 =========================================================================================================
