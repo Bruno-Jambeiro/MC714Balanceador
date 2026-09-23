@@ -9,11 +9,18 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{document}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
 
 \title{Trabalho 1\\
 \large Balanceador de Carga para um Sistema Distribuído}
@@ -40,7 +47,7 @@ A arquitetura do sistema simulado é composta por um \textit{dispatcher} (balanc
     \item \textbf{Fila Mais Curta}: O balanceador consulta o estado de cada servidor no instante da chegada de uma requisição e a envia para aquele com o menor número total de tarefas (esperando na fila somado àquela em execução). Em caso de empate, a escolha entre os empatados é feita aleatoriamente.
 \end{itemize}
 
-Do ponto de vista prático e de implementação de software, a arquitetura foi desenvolvida na linguagem Python de forma modular e orientada a objetos. O projeto é dividido em três componentes principais: o arquivo \texttt{classes.py}, que abriga o núcleo do sistema contendo as entidades \texttt{Pacote}, \texttt{Servidor}, \texttt{Balanceador} e a máquina de estados no motor \texttt{Simulador} (baseado em avanços de tempo discreto); o script principal \texttt{simulacoes.py}, que orquestra a execução das réplicas, injeta os diferentes níveis de carga $\lambda$ e processa o rigor estatístico como as métricas de intervalo de confiança; e o módulo \texttt{graficos.py}, dedicado exclusivamente à geração das representações visuais utilizadas neste relatório.
+Do ponto de vista prático e de implementação de software, a arquitetura foi desenvolvida na linguagem Python de forma modular e orientada a objetos. O projeto é dividido em três componentes principais: o arquivo \texttt{classes.py}, que abriga o núcleo do sistema contendo as entidades \texttt{Pacote}, \texttt{Servidor}, \texttt{Balanceador} e a máquina de estados no motor \texttt{Simulador} (baseado em avanços de tempo discreto); o script principal \texttt{simulacoes.py}, que orquestra a execução das réplicas, injeta os diferentes níveis de carga $\lambda$ e processa o rigor estatístico como as métricas de intervalo de confiança; e o módulo \texttt{graficos.py}, dedicado exclusivamente à geração das representações visuais utilizadas neste relatório. O código-fonte completo, instruções de instalação das dependências (\texttt{numpy}, \texttt{scipy} e \texttt{matplotlib}) e orientações de execução estão documentados no arquivo \texttt{README.md} do repositório público, disponível em \href{https://github.com/Bruno-Jambeiro/MC714Balanceador}{\texttt{github.com/Bruno-Jambeiro/MC714Balanceador}}.
 
 \section{Descrição dos servidores e parametrização do tráfego}
 O sistema é constituído por três servidores homogêneos. Cada servidor opera com uma única \textit{thread} de execução e atende as requisições de forma serial sob a disciplina \textit{First Come, First Served} (FCFS). A fila de cada servidor é assumida como ilimitada. A taxa de serviço individual de cada servidor segue uma distribuição exponencial de média $1/\mu = 1.0$ unidade de tempo (u.t.), o que resulta em uma capacidade de atendimento de $\mu = 1.0$ requisição por unidade de tempo para cada nó. 
@@ -209,6 +216,44 @@ A Figura~\ref{fig:fluido} compara o crescimento de $N(t)$ observado nas simulaç
 
 
 
+
+\section{Divisão de Tarefas}
+
+A Tabela~\ref{tab:divisao} apresenta a divisão das responsabilidades entre os autores ao longo do desenvolvimento do projeto.
+
+\begin{table}[H]
+\caption{Divisão de Tarefas entre os Autores}
+\label{tab:divisao}
+\centering
+\begin{tabular}{|p{0.52\columnwidth}|p{0.38\columnwidth}|}
+\hline
+\textbf{Tarefa} & \textbf{Responsável} \\
+\hline
+Modelagem analítica dos modelos de filas ($M/M/1$, $M/M/c$) & Lucas Bussinger \\
+\hline
+Derivação formal das métricas de desempenho ($E[N]$, $E[R]$, $E[T_Q]$) & Lucas Bussinger \\
+\hline
+Prova de independência dos servidores sob política aleatória & Lucas Bussinger \\
+\hline
+Análise analítica de estabilidade e modelo fluido & Lucas Bussinger \\
+\hline
+Implementação da simulação em Python (\texttt{classes.py}, \texttt{simulacoes.py}) & Bruno Jambeiro \\
+Implementação do motor de simulação e estruturas de dados (\texttt{classes.py}: \texttt{Pacote}, \texttt{Servidor}, \texttt{Balanceador}, \texttt{Simulador}) & Lucas Bussinger \\
+\hline
+Implementação das políticas de roteamento no \texttt{Balanceador} (Aleatória, Round-Robin, Menor Fila) & Lucas Bussinger \\
+\hline
+Orquestração dos experimentos, réplicas e cálculo de intervalos de confiança (\texttt{simulacoes.py}) & Bruno Jambeiro \\
+\hline
+Geração e formatação dos gráficos (\texttt{graficos.py}) & Bruno Jambeiro \\
+\hline
+Configuração do repositório e ambiente de execução & Bruno Jambeiro \\
+\hline
+Interpretação conjunta dos resultados numéricos & Ambos \\
+\hline
+Redação do relatório & Ambos \\
+\hline
+\end{tabular}
+\end{table}
 
 \section{Conclusão}
 As simulações computacionais evidenciaram com sucesso o impacto que estratégias de distribuição de carga geram no tempo de resposta percebido pelo cliente em sistemas distribuídos sob alto fluxo. Conclui-se que o compartilhamento dinâmico de estado instantâneo – inerente à estratégia de Menor Fila – mitiga significativamente o fenômeno natural de estrangulamento por filas, apresentando resiliência superior à elevação drástica de demanda quando comparada às estratégias independentes de estado. Adicionalmente, verificaram-se empiricamente premissas sólidas da Teoria de Filas, consolidando o entendimento de que em regimes estacionários de sistemas não-preemptivos de conservação de trabalho, a vazão e a utilização independem da política, evidenciando o tempo de espera como foco central de otimização por meio do \textit{dispatcher}.
